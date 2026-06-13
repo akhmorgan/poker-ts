@@ -1,5 +1,5 @@
-import { randomInt } from 'crypto'
 import assert from 'assert'
+import { randomInt } from './browserSafe';
 
 export function shuffle<Type>(array: Type[]) {
     for (let index = array.length - 1; index > 0; index--) {

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CardSuit = exports.CardRank = void 0;
-var CardRank;
+export var CardRank;
 (function (CardRank) {
     CardRank[CardRank["_2"] = 0] = "_2";
     CardRank[CardRank["_3"] = 1] = "_3";
@@ -16,27 +13,25 @@ var CardRank;
     CardRank[CardRank["Q"] = 10] = "Q";
     CardRank[CardRank["K"] = 11] = "K";
     CardRank[CardRank["A"] = 12] = "A";
-})(CardRank = exports.CardRank || (exports.CardRank = {}));
-var CardSuit;
+})(CardRank || (CardRank = {}));
+export var CardSuit;
 (function (CardSuit) {
     CardSuit[CardSuit["CLUBS"] = 0] = "CLUBS";
     CardSuit[CardSuit["DIAMONDS"] = 1] = "DIAMONDS";
     CardSuit[CardSuit["HEARTS"] = 2] = "HEARTS";
     CardSuit[CardSuit["SPADES"] = 3] = "SPADES";
-})(CardSuit = exports.CardSuit || (exports.CardSuit = {}));
-var Card = /** @class */ (function () {
-    function Card(rank, suit) {
+})(CardSuit || (CardSuit = {}));
+export default class Card {
+    constructor(rank, suit) {
         this.rank = rank;
         this.suit = suit;
     }
-    Card.compare = function (c1, c2) {
-        var suitDiff = c2.suit - c1.suit;
+    static compare(c1, c2) {
+        const suitDiff = c2.suit - c1.suit;
         if (suitDiff !== 0) {
             return suitDiff;
         }
         return c2.rank - c1.rank;
-    };
-    return Card;
-}());
-exports.default = Card;
+    }
+}
 //# sourceMappingURL=card.js.map

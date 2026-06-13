@@ -1,48 +1,42 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Action = void 0;
-var assert_1 = __importDefault(require("assert"));
-var Action;
+import assert from 'assert';
+export var Action;
 (function (Action) {
     Action[Action["LEAVE"] = 1] = "LEAVE";
     Action[Action["PASSIVE"] = 2] = "PASSIVE";
     Action[Action["AGGRESSIVE"] = 4] = "AGGRESSIVE";
-})(Action = exports.Action || (exports.Action = {}));
-var Round = /** @class */ (function () {
-    function Round(activePlayers, firstToAct) {
+})(Action || (Action = {}));
+export default class Round {
+    constructor(activePlayers, firstToAct) {
         this._contested = false;
         this._firstAction = true;
         this._numActivePlayers = 0;
         this._activePlayers = activePlayers;
         this._playerToAct = firstToAct;
         this._lastAggressiveActor = firstToAct;
-        this._numActivePlayers = activePlayers.filter(function (player) { return !!player; }).length;
-        assert_1.default(firstToAct < activePlayers.length);
+        this._numActivePlayers = activePlayers.filter(player => !!player).length;
+        assert(firstToAct < activePlayers.length);
     }
-    Round.prototype.activePlayers = function () {
+    activePlayers() {
         return this._activePlayers;
-    };
-    Round.prototype.playerToAct = function () {
+    }
+    playerToAct() {
         return this._playerToAct;
-    };
-    Round.prototype.lastAggressiveActor = function () {
+    }
+    lastAggressiveActor() {
         return this._lastAggressiveActor;
-    };
-    Round.prototype.numActivePlayers = function () {
+    }
+    numActivePlayers() {
         return this._numActivePlayers;
-    };
-    Round.prototype.inProgress = function () {
+    }
+    inProgress() {
         return (this._contested || this._numActivePlayers > 1) && (this._firstAction || this._playerToAct !== this._lastAggressiveActor);
-    };
-    Round.prototype.isContested = function () {
+    }
+    isContested() {
         return this._contested;
-    };
-    Round.prototype.actionTaken = function (action) {
-        assert_1.default(this.inProgress());
-        assert_1.default(!(action & Action.PASSIVE && action & Action.AGGRESSIVE));
+    }
+    actionTaken(action) {
+        assert(this.inProgress());
+        assert(!(action & Action.PASSIVE && action & Action.AGGRESSIVE));
         if (this._firstAction) {
             this._firstAction = false;
         }
@@ -59,8 +53,8 @@ var Round = /** @class */ (function () {
             --this._numActivePlayers;
         }
         this.incrementPlayer();
-    };
-    Round.prototype.incrementPlayer = function () {
+    }
+    incrementPlayer() {
         do {
             ++this._playerToAct;
             if (this._playerToAct === this._activePlayers.length)
@@ -68,8 +62,6 @@ var Round = /** @class */ (function () {
             if (this._playerToAct === this._lastAggressiveActor)
                 break;
         } while (!this._activePlayers[this._playerToAct]);
-    };
-    return Round;
-}());
-exports.default = Round;
+    }
+}
 //# sourceMappingURL=round.js.map

@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
+    "module": "ESNext",       // 👈 this is critical
+    "target": "ESNext",       // or at least ES2017+
+    "moduleResolution": "node", // helps Vite + ESM interop
     "outDir": "dist",
+    "declaration": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,

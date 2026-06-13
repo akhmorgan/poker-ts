@@ -1,175 +1,154 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // Facade for the Table class that confirms with the API of https://github.com/JankoDedic/poker.js
-var table_1 = __importStar(require("../lib/table"));
-var community_cards_1 = require("../lib/community-cards");
-var card_1 = require("../lib/card");
-var dealer_1 = require("../lib/dealer");
-var cardMapper = function (card) { return ({
+import Table, { AutomaticAction as AutomaticActionFlag } from '../lib/table';
+import { RoundOfBetting } from '../lib/community-cards';
+import { CardRank, CardSuit } from '../lib/card';
+import { Action as ActionFlag } from '../lib/dealer';
+const cardMapper = card => ({
     // @ts-ignore
-    rank: card_1.CardRank[card.rank].replace(/^_/, ''),
+    rank: CardRank[card.rank].replace(/^_/, ''),
     // @ts-ignore
-    suit: card_1.CardSuit[card.suit].toLowerCase(),
-}); };
-var seatArrayMapper = function (player) { return player === null
+    suit: CardSuit[card.suit].toLowerCase(),
+});
+const seatArrayMapper = player => player === null
     ? null
     : {
         totalChips: player.totalChips(),
         stack: player.stack(),
         betSize: player.betSize(),
-    }; };
-var actionFlagToStringArray = function (actionFlag) {
-    var actions = [];
-    if (actionFlag & dealer_1.Action.FOLD)
+    };
+const actionFlagToStringArray = (actionFlag) => {
+    const actions = [];
+    if (actionFlag & ActionFlag.FOLD)
         actions.push('fold');
-    if (actionFlag & dealer_1.Action.CHECK)
+    if (actionFlag & ActionFlag.CHECK)
         actions.push('check');
-    if (actionFlag & dealer_1.Action.CALL)
+    if (actionFlag & ActionFlag.CALL)
         actions.push('call');
-    if (actionFlag & dealer_1.Action.BET)
+    if (actionFlag & ActionFlag.BET)
         actions.push('bet');
-    if (actionFlag & dealer_1.Action.RAISE)
+    if (actionFlag & ActionFlag.RAISE)
         actions.push('raise');
     return actions;
 };
-var automaticActionFlagToStringArray = function (automaticActionFlag) {
-    var automaticActions = [];
-    if (automaticActionFlag & table_1.AutomaticAction.FOLD)
+const automaticActionFlagToStringArray = (automaticActionFlag) => {
+    const automaticActions = [];
+    if (automaticActionFlag & AutomaticActionFlag.FOLD)
         automaticActions.push('fold');
-    if (automaticActionFlag & table_1.AutomaticAction.CHECK_FOLD)
+    if (automaticActionFlag & AutomaticActionFlag.CHECK_FOLD)
         automaticActions.push('check/fold');
-    if (automaticActionFlag & table_1.AutomaticAction.CHECK)
+    if (automaticActionFlag & AutomaticActionFlag.CHECK)
         automaticActions.push('check');
-    if (automaticActionFlag & table_1.AutomaticAction.CALL)
+    if (automaticActionFlag & AutomaticActionFlag.CALL)
         automaticActions.push('call');
-    if (automaticActionFlag & table_1.AutomaticAction.CALL_ANY)
+    if (automaticActionFlag & AutomaticActionFlag.CALL_ANY)
         automaticActions.push('call any');
-    if (automaticActionFlag & table_1.AutomaticAction.ALL_IN)
+    if (automaticActionFlag & AutomaticActionFlag.ALL_IN)
         automaticActions.push('all-in');
     return automaticActions;
 };
-var stringToAutomaticActionFlag = function (automaticAction) {
+const stringToAutomaticActionFlag = (automaticAction) => {
     switch (automaticAction) {
         case 'fold':
-            return table_1.AutomaticAction.FOLD;
+            return AutomaticActionFlag.FOLD;
         case 'check/fold':
-            return table_1.AutomaticAction.CHECK_FOLD;
+            return AutomaticActionFlag.CHECK_FOLD;
         case 'check':
-            return table_1.AutomaticAction.CHECK;
+            return AutomaticActionFlag.CHECK;
         case 'call':
-            return table_1.AutomaticAction.CALL;
+            return AutomaticActionFlag.CALL;
         case 'call any':
-            return table_1.AutomaticAction.CALL_ANY;
+            return AutomaticActionFlag.CALL_ANY;
         case 'all-in':
-            return table_1.AutomaticAction.ALL_IN;
+            return AutomaticActionFlag.ALL_IN;
     }
 };
-var Poker = /** @class */ (function () {
-    function Poker(forcedBets, numSeats) {
-        var ante = forcedBets.ante, big = forcedBets.bigBlind, small = forcedBets.smallBlind;
-        this._table = new table_1.default({ ante: ante, blinds: { big: big, small: small } }, numSeats);
+export default class Poker {
+    constructor(forcedBets, numSeats) {
+        const { ante, bigBlind: big, smallBlind: small } = forcedBets;
+        this._table = new Table({ ante, blinds: { big, small } }, numSeats);
     }
-    Poker.prototype.playerToAct = function () {
+    playerToAct() {
         return this._table.playerToAct();
-    };
-    Poker.prototype.button = function () {
+    }
+    button() {
         return this._table.button();
-    };
-    Poker.prototype.seats = function () {
+    }
+    seats() {
         return this._table.seats().map(seatArrayMapper);
-    };
-    Poker.prototype.handPlayers = function () {
+    }
+    handPlayers() {
         return this._table.handPlayers().map(seatArrayMapper);
-    };
-    Poker.prototype.numActivePlayers = function () {
+    }
+    numActivePlayers() {
         return this._table.numActivePlayers();
-    };
-    Poker.prototype.pots = function () {
-        return this._table.pots().map(function (pot) { return ({
+    }
+    pots() {
+        return this._table.pots().map(pot => ({
             size: pot.size(),
             eligiblePlayers: pot.eligiblePlayers(),
-        }); });
-    };
-    Poker.prototype.forcedBets = function () {
-        var _a = this._table.forcedBets(), _b = _a.ante, ante = _b === void 0 ? 0 : _b, _c = _a.blinds, bigBlind = _c.big, smallBlind = _c.small;
+        }));
+    }
+    forcedBets() {
+        const { ante = 0, blinds: { big: bigBlind, small: smallBlind } } = this._table.forcedBets();
         return {
-            ante: ante,
-            smallBlind: smallBlind,
-            bigBlind: bigBlind,
+            ante,
+            smallBlind,
+            bigBlind,
         };
-    };
-    Poker.prototype.setForcedBets = function (forcedBets) {
-        var ante = forcedBets.ante, big = forcedBets.bigBlind, small = forcedBets.smallBlind;
-        this._table.setForcedBets({ ante: ante, blinds: { small: small, big: big } });
-    };
-    Poker.prototype.numSeats = function () {
+    }
+    setForcedBets(forcedBets) {
+        const { ante, bigBlind: big, smallBlind: small } = forcedBets;
+        this._table.setForcedBets({ ante, blinds: { small, big } });
+    }
+    numSeats() {
         return this._table.numSeats();
-    };
-    Poker.prototype.startHand = function (seat) {
+    }
+    startHand(seat) {
         this._table.startHand(seat);
-    };
-    Poker.prototype.isHandInProgress = function () {
+    }
+    isHandInProgress() {
         return this._table.handInProgress();
-    };
-    Poker.prototype.isBettingRoundInProgress = function () {
+    }
+    isBettingRoundInProgress() {
         return this._table.bettingRoundInProgress();
-    };
-    Poker.prototype.areBettingRoundsCompleted = function () {
+    }
+    areBettingRoundsCompleted() {
         return this._table.bettingRoundsCompleted();
-    };
-    Poker.prototype.roundOfBetting = function () {
-        var rob = this._table.roundOfBetting();
+    }
+    roundOfBetting() {
+        const rob = this._table.roundOfBetting();
         // @ts-ignore
-        return community_cards_1.RoundOfBetting[rob].toLowerCase();
-    };
-    Poker.prototype.communityCards = function () {
+        return RoundOfBetting[rob].toLowerCase();
+    }
+    communityCards() {
         return this._table.communityCards().cards().map(cardMapper);
-    };
-    Poker.prototype.legalActions = function () {
-        var _a = this._table.legalActions(), action = _a.action, chipRange = _a.chipRange;
+    }
+    legalActions() {
+        const { action, chipRange } = this._table.legalActions();
         return {
             actions: actionFlagToStringArray(action),
-            chipRange: chipRange,
+            chipRange,
         };
-    };
-    Poker.prototype.holeCards = function () {
-        return this._table.holeCards().map(function (cards) {
+    }
+    holeCards() {
+        return this._table.holeCards().map(cards => {
             return cards === null
                 ? null
                 : cards.map(cardMapper);
         });
-    };
-    Poker.prototype.actionTaken = function (action, betSize) {
-        this._table.actionTaken(dealer_1.Action[action.toUpperCase()], betSize);
-    };
-    Poker.prototype.endBettingRound = function () {
+    }
+    actionTaken(action, betSize) {
+        this._table.actionTaken(ActionFlag[action.toUpperCase()], betSize);
+    }
+    endBettingRound() {
         this._table.endBettingRound();
-    };
-    Poker.prototype.showdown = function () {
+    }
+    showdown() {
         this._table.showdown();
-    };
-    Poker.prototype.winners = function () {
-        return this._table.winners().map(function (potWinners) { return potWinners.map(function (winner) {
-            var seatIndex = winner[0], hand = winner[1], holeCards = winner[2];
+    }
+    winners() {
+        return this._table.winners().map(potWinners => potWinners.map(winner => {
+            const [seatIndex, hand, holeCards] = winner;
             return [
                 seatIndex,
                 {
@@ -179,33 +158,31 @@ var Poker = /** @class */ (function () {
                 },
                 holeCards.map(cardMapper),
             ];
-        }); });
-    };
-    Poker.prototype.automaticActions = function () {
-        return this._table.automaticActions().map(function (action) {
+        }));
+    }
+    automaticActions() {
+        return this._table.automaticActions().map(action => {
             return action === null
                 ? null
                 : automaticActionFlagToStringArray(action)[0];
         });
-    };
-    Poker.prototype.canSetAutomaticActions = function (seatIndex) {
+    }
+    canSetAutomaticActions(seatIndex) {
         return this._table.canSetAutomaticAction(seatIndex);
-    };
-    Poker.prototype.legalAutomaticActions = function (seatIndex) {
-        var automaticActionFlag = this._table.legalAutomaticActions(seatIndex);
+    }
+    legalAutomaticActions(seatIndex) {
+        const automaticActionFlag = this._table.legalAutomaticActions(seatIndex);
         return automaticActionFlagToStringArray(automaticActionFlag);
-    };
-    Poker.prototype.setAutomaticAction = function (seatIndex, action) {
-        var automaticAction = action === null ? action : stringToAutomaticActionFlag(action);
+    }
+    setAutomaticAction(seatIndex, action) {
+        const automaticAction = action === null ? action : stringToAutomaticActionFlag(action);
         this._table.setAutomaticAction(seatIndex, automaticAction);
-    };
-    Poker.prototype.sitDown = function (seatIndex, buyIn) {
+    }
+    sitDown(seatIndex, buyIn) {
         this._table.sitDown(seatIndex, buyIn);
-    };
-    Poker.prototype.standUp = function (seatIndex) {
+    }
+    standUp(seatIndex) {
         this._table.standUp(seatIndex);
-    };
-    return Poker;
-}());
-exports.default = Poker;
+    }
+}
 //# sourceMappingURL=poker.js.map
